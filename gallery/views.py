@@ -41,3 +41,6 @@ def delete_product(request, pk):
 
 def home(request):
     return HttpResponse('Hello, World!')
+
+def contact(request):
+    return render(request, 'myapp/contact.html')
