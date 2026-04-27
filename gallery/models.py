@@ -26,3 +26,22 @@ class Product(models.Model):
         else:
             # If the description is already less than 50 words, return it as is
             return self.description
+        
+
+from django.db import models
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Full Name")
+    email = models.EmailField(verbose_name="Email Address")
+    subject = models.CharField(max_length=200, verbose_name="Subject")
+    message = models.TextField(verbose_name="Message")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Sent On")
+    is_read = models.BooleanField(default=False, verbose_name="Mark as Read")
+
+    class Meta:
+        verbose_name = "Contact Message"
+        verbose_name_plural = "Contact Messages"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"        

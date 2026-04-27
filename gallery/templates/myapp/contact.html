@@ -1,7 +1,7 @@
 {% extends 'myapp/master.html' %}
 {% load static %}
 
-{% block title %}FolioBlog | Contact Us{% endblock %}
+{% block title %}Linoh Graphics | Contact Us{% endblock %}
 
 {% block content %}
 <main id="main">
@@ -89,55 +89,75 @@
                 
                 <!-- Contact Form (Right Column) -->
                 <div class="col-lg-6">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-body p-4 p-xl-5">
-                            <h3 class="h4 mb-4 fw-semibold">Send a Message</h3>
-                            <p class="text-secondary mb-4">We'll respond to your inquiry within 24 hours.</p>
-                            
-                            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-2">
-                                            <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
-                                            <label for="name">Full Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating mb-2">
-                                            <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
-                                            <label for="email">Email Address</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-floating mb-2">
-                                            <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
-                                            <label for="subject">Subject</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-floating mb-3">
-                                            <textarea class="form-control" name="message" id="message" rows="5" placeholder="Message" style="height: 150px;" required></textarea>
-                                            <label for="message">Your Message</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Status messages (compatible with original JS) -->
-                                <div class="my-3">
-                                    <div class="loading alert alert-info d-none" role="alert">Sending message... Please wait.</div>
-                                    <div class="error-message alert alert-danger d-none" role="alert"></div>
-                                    <div class="sent-message alert alert-success d-none" role="alert">Your message has been sent. Thank you!</div>
-                                </div>
-                                
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
-                                        Send Message <i class="bi bi-arrow-right ms-2"></i>
-                                    </button>
-                                </div>
-                            </form>
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-xl-5">
+            <h3 class="h4 mb-4 fw-semibold">Send a Message</h3>
+            <p class="text-secondary mb-4">We'll respond to your inquiry within 24 hours.</p>
+
+            <!-- Django messages (success/error) -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'contact' %}">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="text" name="name" class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   id="id_name" placeholder="Your Name" value="{{ form.name.value|default:'' }}" required>
+                            <label for="id_name">Full Name</label>
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-2">
+                            <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                   id="id_email" placeholder="Your Email" value="{{ form.email.value|default:'' }}" required>
+                            <label for="id_email">Email Address</label>
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mb-2">
+                            <input type="text" name="subject" class="form-control {% if form.subject.errors %}is-invalid{% endif %}"
+                                   id="id_subject" placeholder="Subject" value="{{ form.subject.value|default:'' }}" required>
+                            <label for="id_subject">Subject</label>
+                            {% if form.subject.errors %}
+                                <div class="invalid-feedback">{{ form.subject.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <textarea name="message" class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+                                      id="id_message" rows="5" placeholder="Message" style="height: 150px;" required>{{ form.message.value|default:'' }}</textarea>
+                            <label for="id_message">Your Message</label>
+                            {% if form.message.errors %}
+                                <div class="invalid-feedback">{{ form.message.errors.0 }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill">
+                        Send Message <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </section>
@@ -154,6 +174,14 @@
 
 <!-- Simple script to toggle message visibility (enhances UX, works alongside existing backend logic) -->
 <script>
+
+    document.querySelector('form').addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = 'Sending... <i class="bi bi-hourglass-split ms-2"></i>';
+    });
+
+
     (function() {
         const form = document.querySelector('.php-email-form');
         if (form) {

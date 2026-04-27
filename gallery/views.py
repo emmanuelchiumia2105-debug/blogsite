@@ -3,12 +3,18 @@ from .models import Product
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product
-from .forms import ProductForm  
+from .forms import ProductForm , ContactMessageForm
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
+from django.contrib import messages
+
+
 from django.core.paginator import Paginator
 
 def product_list(request):
     products = Product.objects.all().order_by('-created_at')  # order by newest first
-    paginator = Paginator(products, 3)  # Show 6 products per page
+    paginator = Paginator(products, 6)  # Show 6 products per page
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)  # safer than paginator.page()
@@ -42,5 +48,33 @@ def delete_product(request, pk):
 def home(request):
     return HttpResponse('Hello, World!')
 
-def contact(request):
-    return render(request, 'myapp/contact.html')
+
+def portfolio(request):
+    products = Product.objects.all().order_by('-created_at')  # order by newest first
+    paginator = Paginator(products, 3)  # Show 3 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)  # safer than paginator.page()
+    return render(request, 'myapp/portfolio.html', {'page_obj': page_obj})
+
+
+
+
+
+def contact_view(request):
+    # Handle form submission
+    if request.method == 'POST':
+        form = ContactMessageForm(request.POST)
+        if form.is_valid():
+            form.save()  # saves to ContactMessage model
+            messages.success(request, 'Your message has been sent. Thank you!')
+            return redirect('contact')  # redirect to the same contact page
+        else:
+            # Add form errors as Django messages (optional)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = ContactMessageForm()
+
+    # Render the contact page with the form (empty or with errors)
+    return render(request, 'myapp/contact.html', {'form': form})

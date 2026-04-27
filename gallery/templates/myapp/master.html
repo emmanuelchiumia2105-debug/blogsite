@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>{% block title %}DesignFolio | Graphic Design Blog{% endblock %}</title>
+  <title>{% block title %}Linoh Graphics | Graphic Design Blog{% endblock %}</title>
   {% load bootstrap5 %}
   {% bootstrap_css %}
   {% bootstrap_javascript %}
@@ -13,7 +13,7 @@
   <style>
     /* minimal custom touches that enhance Bootstrap — no framework override */
     body {
-      background: #fefaf5;
+      background: #bdbab8;
     }
     .navbar-brand-custom {
       font-weight: 700;
@@ -64,7 +64,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-custom px-3 py-2 rounded-pill" href="#">
+                    <a class="nav-link nav-link-custom px-3 py-2 rounded-pill" href="{% url 'product_list2' %}">
+                         <i class="bi bi-grid
                         <i class="bi bi-grid-3x3-gap-fill me-1"></i>Portfolio
                     </a>
                 </li>
